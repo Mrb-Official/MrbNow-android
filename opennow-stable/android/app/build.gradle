@@ -1,6 +1,14 @@
-def keystorePropertiesFile = file("D:\\Projects\\gfnclient\\keystore.properties")
+// Release signing is optional: only loaded if keystore.properties exists
+// next to this build.gradle file. This keeps `assembleDebug` (and CI)
+// working with zero signing setup, while still supporting a local,
+// signed `assembleRelease` build for anyone who drops in their own
+// keystore.properties file.
+def keystorePropertiesFile = file("keystore.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+def hasReleaseSigning = keystorePropertiesFile.exists()
+if (hasReleaseSigning) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -19,19 +27,23 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    signingConfigs {
-        release {
-            storeFile file(keystoreProperties['RELEASE_STORE_FILE'])
-            storePassword keystoreProperties['RELEASE_STORE_PASSWORD']
-            keyAlias keystoreProperties['RELEASE_KEY_ALIAS']
-            keyPassword keystoreProperties['RELEASE_KEY_PASSWORD']
+    if (hasReleaseSigning) {
+        signingConfigs {
+            release {
+                storeFile file(keystoreProperties['RELEASE_STORE_FILE'])
+                storePassword keystoreProperties['RELEASE_STORE_PASSWORD']
+                keyAlias keystoreProperties['RELEASE_KEY_ALIAS']
+                keyPassword keystoreProperties['RELEASE_KEY_PASSWORD']
+            }
         }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
@@ -48,18 +60,10 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
-    implementation project(':capacitor-cordova-android-plugins')
-
-    // Required by GfnPlugin.kt and AndroidSignalingManager.kt
-    implementation "com.squareup.okhttp3:okhttp:4.12.0"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
-    implementation "androidx.security:security-crypto:1.1.0-alpha06"
-    implementation "androidx.browser:browser:1.8.0"
-    implementation "com.android.volley:volley:1.2.1"
-
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
 }
 
 apply from: 'capacitor.build.gradle'
