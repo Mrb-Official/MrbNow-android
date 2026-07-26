@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Lock files (keep bun.lock, ignore others)
+yarn.lock
+pnpm-lock.yaml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+nul
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Sensitive data
+*.tokens.json
+gfn_tokens.json
+
+# Test files
+test/
+
+package-lock.json
+!opennow-stable/package-lock.json
+
+# AI Agent guidelines (local only)
+AGENTS.md
+release-notes.md
