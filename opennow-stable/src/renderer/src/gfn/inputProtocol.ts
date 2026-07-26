@@ -81,7 +81,7 @@ export interface GamepadInput {
   timestampUs: bigint;
 }
 
-const codeMap: Record<string, { vk: number; scancode: number }> = {
+export const codeMap: Record<string, { vk: number; scancode: number }> = {
   // Letters
   KeyA: { vk: 0x41, scancode: 0x04 },
   KeyB: { vk: 0x42, scancode: 0x05 },

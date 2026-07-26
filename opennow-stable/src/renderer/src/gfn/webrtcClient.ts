@@ -17,6 +17,7 @@ import {
   normalizeToInt16,
   normalizeToUint8,
   GAMEPAD_MAX_CONTROLLERS,
+  codeMap,
   type GamepadInput,
 } from "./inputProtocol";
 import {
@@ -2975,6 +2976,20 @@ export class GfnWebRtcClient {
     const usePR = this.mouseInputChannel?.readyState === "open";
     const bytes = this.inputEncoder.encodeGamepadState(state, this.gamepadBitmap | 1, usePR);
     this.sendGamepad(bytes);
+  }
+
+  /**
+   * Send a keyboard key down/up using a KeyboardEvent.code string
+   * (e.g. "KeyW", "ShiftLeft", "Space"). This reuses the exact same
+   * encode + send path as the on-screen paste/type keyboard —
+   * no new wire format, just a public entry point for the custom
+   * on-screen gamepad buttons (WASD etc.) to call.
+   */
+  public sendVirtualKey(code: string, isDown: boolean): void {
+    if (!this.inputReady) return;
+    const mapped = codeMap[code];
+    if (!mapped) return; // unknown code string — silently ignore
+    this.sendKeyPacket(mapped.vk, mapped.scancode, 0, isDown);
   }
 
   /**

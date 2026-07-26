@@ -15,6 +15,7 @@ import type {
 } from "@shared/gfn";
 import { colorQualityRequiresHevc } from "@shared/gfn";
 import { formatShortcutForDisplay, normalizeShortcut } from "../shortcuts";
+import { GamepadEditor } from "./GamepadEditor";
 
 interface SettingsPageProps {
   settings: Settings;
@@ -447,6 +448,7 @@ function getTierDisplay(tier: string): { label: string; className: string } {
 export function SettingsPage({ settings, regions, onSettingChange, user, subscription, onLogout }: SettingsPageProps): JSX.Element {
   const tierInfo = user ? getTierDisplay(user.membershipTier) : null;
   const [savedIndicator, setSavedIndicator] = useState(false);
+  const [gamepadEditorOpen, setGamepadEditorOpen] = useState(false);
   const [regionSearch, setRegionSearch] = useState("");
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false);
 
@@ -1213,6 +1215,23 @@ export function SettingsPage({ settings, regions, onSettingChange, user, subscri
           </div>
           <div className="settings-rows">
             <div className="settings-row">
+              <label className="settings-label">
+                Gamepad Layout
+                <span className="settings-hint">
+                  Customize on-screen gamepad buttons, icons, and keyboard-key buttons (WASD, sprint, etc).
+                  No game session required.
+                </span>
+              </label>
+              <button
+                type="button"
+                className="settings-shortcut-reset-btn"
+                onClick={() => setGamepadEditorOpen(true)}
+              >
+                Edit Layout
+              </button>
+            </div>
+
+            <div className="settings-row">
               <label className="settings-label">Clipboard Paste</label>
               <label className="settings-toggle">
                 <input
@@ -1436,6 +1455,10 @@ export function SettingsPage({ settings, regions, onSettingChange, user, subscri
           Save Settings
         </button>
       </div>
+
+      {gamepadEditorOpen && (
+        <GamepadEditor onClose={() => setGamepadEditorOpen(false)} />
+      )}
     </div>
   );
 }

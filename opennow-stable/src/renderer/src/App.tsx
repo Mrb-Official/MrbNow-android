@@ -1510,6 +1510,7 @@ export function App(): JSX.Element {
             audioRef={audioRef}
             stats={diagnostics}
             showStats={showStatsOverlay}
+            clientRef={clientRef}
             shortcuts={{
               toggleStats: formatShortcutForDisplay(settings.shortcutToggleStats, isMac),
               togglePointerLock: formatShortcutForDisplay(settings.shortcutTogglePointerLock, isMac),

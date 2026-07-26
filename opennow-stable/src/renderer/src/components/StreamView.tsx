@@ -1,13 +1,17 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { JSX } from "react";
 import { Maximize, Minimize, Gamepad2, Loader2, LogOut, Clock3, AlertTriangle, Mic, MicOff } from "lucide-react";
-import type { StreamDiagnostics } from "../gfn/webrtcClient";
+import type { StreamDiagnostics, GfnWebRtcClient } from "../gfn/webrtcClient";
+import { TouchGamepad } from "./TouchGamepad";
+import { isAndroid } from "../platform/detect";
 
 interface StreamViewProps {
   videoRef: React.Ref<HTMLVideoElement>;
   audioRef: React.Ref<HTMLAudioElement>;
   stats: StreamDiagnostics;
   showStats: boolean;
+  /** Ref to the active WebRTC client, used to drive the on-screen gamepad overlay. */
+  clientRef?: React.RefObject<GfnWebRtcClient | null>;
   shortcuts: {
     toggleStats: string;
     togglePointerLock: string;
@@ -99,6 +103,7 @@ export function StreamView({
   audioRef,
   stats,
   showStats,
+  clientRef,
   shortcuts,
   serverRegion,
   connectedControllers,
@@ -253,6 +258,11 @@ export function StreamView({
         }}
       />
       <audio ref={audioRef} autoPlay playsInline />
+
+      {/* On-screen gamepad overlay (Android only, shown once the stream is connected) */}
+      {isAndroid() && clientRef && hasResolution && !isConnecting && (
+        <TouchGamepad clientRef={clientRef} visible={true} />
+      )}
 
       {/* Gradient background when no video */}
       {!hasResolution && (
