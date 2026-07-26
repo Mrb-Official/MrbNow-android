@@ -1,144 +1,45 @@
-# OpenNOW - Android
+# MrbNow
 
-Unofficial GeForce NOW client for Android, built with Capacitor + React + WebRTC.
+A cloud gaming client for Android with a fully customizable on-screen controller.
 
----
+## Overview
 
-> **Warning**  
-> OpenNOW is under active development. Bugs and performance issues are expected while features are finalized.
+MrbNow streams your games to your phone with a touch controller built for touch — not just a copy-pasted gamepad. Move buttons wherever you want, swap icons, and add extra keys (WASD, sprint, reload, whatever you need) right from Settings, no game session needed.
 
-> **Trademark & Affiliation Notice**  
-> OpenNOW is an independent community project and is **not affiliated with, endorsed by, or sponsored by NVIDIA Corporation**.  
-> **NVIDIA** and **GeForce NOW** are trademarks of NVIDIA Corporation. You must use your own GeForce NOW account.
+## Features
 
----
+- Cloud game streaming on Android
+- Custom gamepad overlay
+  - Drag any button to reposition it
+  - Swap icons to whatever you like
+  - Add keyboard-key buttons — WASD, sprint, jump, reload, melee, and more
+  - Edit your layout anytime from Settings
+- Smooth performance, built on React + Capacitor
 
-## Prerequisites
+## Getting Started
 
-| Tool | Version | Notes |
-|------|---------|-------|
-| Node.js | 18 or newer | https://nodejs.org |
-| Android Studio | Hedgehog or newer | https://developer.android.com/studio |
-| Android SDK | API 36 (compile), API 24 (min) | Install via SDK Manager in Android Studio |
-| JDK | 17 | Bundled with Android Studio |
-| ADB | any | Part of Android SDK platform-tools |
-
-After installing Android Studio, open it once and let it finish the initial SDK setup.
-
-Add ADB to your PATH so it works from a terminal:
-
-```powershell
-# Add to your PowerShell profile or system environment variables
-$env:PATH += ";$env:LOCALAPPDATA\Android\Sdk\platform-tools"
-```
-
----
-
-## First time setup
-
-```powershell
+```bash
 cd opennow-stable
 npm install
-```
-
-The `android/` folder is already checked in. You do not need to run `cap init` or `cap add android`.
-
----
-
-## Build and install
-
-### Step 1 - Build the web bundle
-
-```powershell
-npm run build
-```
-
-### Step 2 - Sync web assets into the Android project
-
-```powershell
-npx cap sync android
-```
-
-Copies `dist/` into the Android project and updates Capacitor plugins.
-Run this every time after `npm run build`.
-
-### Step 3 - Build the APK
-
-```powershell
-cd android
-.\gradlew assembleDebug
-```
-
-Output: `android/app/build/outputs/apk/debug/app-debug.apk`
-
-### Step 4 - Install on device
-
-Make sure your device is connected with USB debugging enabled.
-
-```powershell
-# Check device is visible
-adb devices
-
-# Uninstall old version first (avoids signature mismatch errors)
-adb uninstall com.zortos.opennow
-
-# Install
-adb install app\build\outputs\apk\debug\app-debug.apk
-```
-
----
-
-## Quick rebuild (after any code change)
-
-Run all steps from the project root:
-
-```powershell
-cd opennow-stable
 npm run build
 npx cap sync android
 cd android
-.\gradlew assembleDebug
-adb uninstall com.zortos.opennow
-adb install app\build\outputs\apk\debug\app-debug.apk
+./gradlew assembleDebug
 ```
 
----
-
-## Open in Android Studio
-
-```powershell
-npx cap open android
+Install the APK:
+```bash
+adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Or open the `android/` folder directly in Android Studio.
+## Customizing Your Controller
 
----
+1. Go to Settings → Input → Gamepad Layout
+2. Drag buttons to reposition them
+3. Tap any button to change its icon or remove it
+4. Add new buttons with "+ Add button"
+5. Done — it saves automatically
 
-## Logcat (debug output)
+## License
 
-```powershell
-# Live output filtered to app logs
-adb logcat | Select-String "Capacitor|chromium|WebRTC|GfnPlugin"
-
-# Last 200 lines then exit
-adb logcat -d | Select-String "Capacitor|Console|error" | Select-Object -Last 200
-```
-
----
-
-## Android details
-
-- App ID: `com.zortos.opennow`
-- Min SDK: API 24 (Android 7.0)
-- Target/Compile SDK: API 36
-
-## How it works
-
-| Feature | Implementation |
-|---------|---------------|
-| Auth (login) | Kotlin `GfnPlugin.kt` -- opens a WebView activity for NVIDIA OAuth PKCE. Tokens stored in `EncryptedSharedPreferences` |
-| Games API | Browser `fetch` running directly in the WebView -- no Kotlin involved |
-| Session management | Browser `fetch` running directly in the WebView -- no Kotlin involved |
-| Signaling | `BrowserSignalingClient` -- native WebSocket in the WebView -- no Kotlin involved |
-| WebRTC | Browser built-in WebRTC stack inside the WebView |
-| Settings | Kotlin `GfnPlugin.kt` -- stored in `SharedPreferences` |
+MIT — free to use, modify, and build on. See [LICENSE](./LICENSE).
